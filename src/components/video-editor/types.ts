@@ -66,6 +66,22 @@ export type CursorStyle =
 export const DEFAULT_CURSOR_STYLE: CursorStyle = "tahoe";
 
 export type CursorClickEffectStyle = "none" | "spotlight" | "ripple" | "echo";
+
+export interface CursorClickEffectProfile {
+	effect: CursorClickEffectStyle;
+	color: string;
+}
+
+export function resolveCursorClickEffectProfile(
+	leftClickEffect: CursorClickEffectProfile,
+	rightClickEffect: CursorClickEffectProfile | undefined,
+	interactionType: CursorTelemetryPoint["interactionType"],
+): CursorClickEffectProfile {
+	return interactionType === "right-click" && rightClickEffect
+		? rightClickEffect
+		: leftClickEffect;
+}
+
 export const DEFAULT_CURSOR_CLICK_EFFECT: CursorClickEffectStyle = "none";
 export const DEFAULT_CURSOR_CLICK_EFFECT_COLOR = "#2563EB";
 export const DEFAULT_CURSOR_CLICK_EFFECT_SCALE = 1;
@@ -104,6 +120,35 @@ export function normalizeCursorClickEffectColor(
 	}
 
 	return trimmed.toUpperCase();
+}
+
+export function normalizeCursorClickEffectProfile(
+	value: unknown,
+): CursorClickEffectProfile | undefined {
+	if (!value || typeof value !== "object") {
+		return undefined;
+	}
+
+	const candidate = value as { effect?: unknown; color?: unknown };
+	if (
+		candidate.effect !== "none" &&
+		candidate.effect !== "spotlight" &&
+		candidate.effect !== "ripple" &&
+		candidate.effect !== "echo" &&
+		candidate.effect !== "burst"
+	) {
+		return undefined;
+	}
+
+	const color = normalizeCursorClickEffectColor(candidate.color, "");
+	if (!color) {
+		return undefined;
+	}
+
+	return {
+		effect: normalizeCursorClickEffectStyle(candidate.effect),
+		color,
+	};
 }
 
 export type EditorEffectSection =

@@ -43,7 +43,11 @@ describe("normalizeProjectEditor", () => {
 		};
 		const normalized = normalizeProjectEditor(savedEditor);
 		expect(normalized.zoomMotionBlur).toBe(0.6);
-		for (const field of ["zoomTemporalMotionBlur", "zoomMotionBlurSampleCount", "zoomMotionBlurShutterFraction"]) {
+		for (const field of [
+			"zoomTemporalMotionBlur",
+			"zoomMotionBlurSampleCount",
+			"zoomMotionBlurShutterFraction",
+		]) {
 			expect(normalized).not.toHaveProperty(field);
 		}
 	});
@@ -112,6 +116,33 @@ describe("normalizeProjectEditor", () => {
 
 		expect(editor.webcam.roundness).toBeCloseTo(17.36, 1);
 		expect(editor.webcam.cornerRadius).toBeUndefined();
+	});
+
+	it("preserves a valid custom right-click effect profile", () => {
+		const editor = normalizeProjectEditor({
+			cursorClickEffect: "ripple",
+			cursorClickEffectColor: "#2563EB",
+			rightClickEffect: {
+				effect: "spotlight",
+				color: "#F97316",
+			},
+		} as never);
+
+		expect(editor.rightClickEffect).toEqual({
+			effect: "spotlight",
+			color: "#F97316",
+		});
+	});
+
+	it("leaves an invalid right-click effect profile in inherit-left mode", () => {
+		const editor = normalizeProjectEditor({
+			rightClickEffect: {
+				effect: "invalid",
+				color: "not-a-color",
+			},
+		} as never);
+
+		expect(editor.rightClickEffect).toBeUndefined();
 	});
 
 	it("uses the legacy webcam size when migrating radius pixels", () => {
