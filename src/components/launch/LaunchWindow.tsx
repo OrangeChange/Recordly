@@ -247,6 +247,7 @@ function LaunchWindowContent() {
 		<RecordingControls
 			paused={paused}
 			microphoneEnabled={microphoneEnabled}
+			systemAudioEnabled={systemAudioEnabled}
 			elapsed={elapsed}
 			onToggleMicrophone={() => setMicrophoneEnabled(!microphoneEnabled)}
 			onPauseResume={paused ? resumeRecording : pauseRecording}

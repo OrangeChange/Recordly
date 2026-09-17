@@ -62,7 +62,6 @@ export function SystemAudioPopover({
 				icon={
 					systemAudioEnabled ? <SpeakerHighIcon size={16} /> : <SpeakerXIcon size={16} />
 				}
-				selected={systemAudioEnabled}
 				onClick={onToggleSystemAudio}
 			>
 				{systemAudioEnabled
