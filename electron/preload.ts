@@ -533,6 +533,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 		source: ProcessedDesktopSource,
 		options?: {
 			capturesSystemAudio?: boolean;
+			systemAudioDeviceId?: string;
+			systemAudioDeviceName?: string;
 			capturesMicrophone?: boolean;
 			microphoneDeviceId?: string;
 			microphoneLabel?: string;
@@ -1001,11 +1003,26 @@ contextBridge.exposeInMainWorld("electronAPI", {
 	getAppVersion: () => ipcRenderer.invoke("app:getVersion"),
 	getAnnouncements: () => ipcRenderer.invoke("announcements:get"),
 	getRecordingPreferences: () => ipcRenderer.invoke("get-recording-preferences"),
+	getNativeAudioOutputDevices: () => ipcRenderer.invoke("get-native-audio-output-devices"),
+	startAudioOutputLevelMonitor: () => ipcRenderer.invoke("start-audio-output-level-monitor"),
+	stopAudioOutputLevelMonitor: () => ipcRenderer.invoke("stop-audio-output-level-monitor"),
+	onAudioOutputLevel: (
+		callback: (event: import("./ipc/audioOutputMonitor").AudioOutputLevelEvent) => void,
+	) => {
+		const listener = (
+			_event: Electron.IpcRendererEvent,
+			payload: import("./ipc/audioOutputMonitor").AudioOutputLevelEvent,
+		) => callback(payload);
+		ipcRenderer.on("audio-output-level", listener);
+		return () => ipcRenderer.removeListener("audio-output-level", listener);
+	},
 	getRecordingAudioLabConfig: () => ipcRenderer.invoke("get-recording-audio-lab-config"),
 	setRecordingPreferences: (prefs: {
 		microphoneEnabled?: boolean;
 		microphoneDeviceId?: string;
 		systemAudioEnabled?: boolean;
+		systemAudioDeviceId?: string;
+		systemAudioDeviceName?: string;
 		webcamEnabled?: boolean;
 		webcamDeviceId?: string;
 	}) => ipcRenderer.invoke("set-recording-preferences", prefs),

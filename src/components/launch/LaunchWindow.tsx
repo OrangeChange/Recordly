@@ -6,6 +6,8 @@ import {
 	MicrophoneSlashIcon,
 	MinusIcon,
 	MonitorIcon,
+	SpeakerHighIcon,
+	SpeakerXIcon,
 	TimerIcon,
 	VideoCameraIcon,
 	VideoCameraSlashIcon,
@@ -16,6 +18,7 @@ import { useEffect, useRef } from "react";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { Separator } from "@/components/ui/separator";
 import { useScopedT } from "../../contexts/I18nContext";
+import { useAudioOutputDevices } from "../../hooks/audioOutputDevices";
 import { useMicrophoneDevices } from "../../hooks/useMicrophoneDevices";
 import { useScreenRecorder } from "../../hooks/useScreenRecorder";
 import { useVideoDevices } from "../../hooks/useVideoDevices";
@@ -40,6 +43,7 @@ import { MicPopover } from "./popovers/MicPopover";
 import { MorePopover } from "./popovers/MorePopover";
 import { ProjectPopover } from "./popovers/ProjectPopover";
 import { SourcePopover } from "./popovers/SourcePopover";
+import { SystemAudioPopover } from "./popovers/SystemAudioPopover";
 import { WebcamPopover } from "./popovers/WebcamPopover";
 import { RecordingControls } from "./RecordingControls";
 
@@ -72,6 +76,9 @@ function LaunchWindowContent() {
 		setMicrophoneDeviceId,
 		systemAudioEnabled,
 		setSystemAudioEnabled,
+		systemAudioDeviceId,
+		systemAudioDeviceName,
+		setSystemAudioDevice,
 		webcamEnabled,
 		setWebcamEnabled,
 		webcamDeviceId,
@@ -106,6 +113,16 @@ function LaunchWindowContent() {
 		selectedDeviceId: selectedVideoDeviceId,
 		setSelectedDeviceId: setSelectedVideoDeviceId,
 	} = useVideoDevices(webcamEnabled || openId === "webcam");
+	const {
+		devices: audioOutputDevices,
+		selectedDeviceId: selectedAudioOutputDeviceId,
+		selectedDevice: selectedAudioOutputDevice,
+		setSelectedDeviceId: setSelectedAudioOutputDeviceId,
+	} = useAudioOutputDevices(
+		systemAudioEnabled || openId === "system-audio",
+		systemAudioDeviceId,
+		systemAudioDeviceName,
+	);
 
 	const {
 		hudOverlayMousePassthroughSupported,
@@ -131,6 +148,25 @@ function LaunchWindowContent() {
 			setWebcamDeviceId(selectedVideoDeviceId);
 		}
 	}, [selectedVideoDeviceId, setWebcamDeviceId]);
+
+	useEffect(() => {
+		if (
+			systemAudioDeviceId &&
+			audioOutputDevices.length > 0 &&
+			selectedAudioOutputDeviceId !== systemAudioDeviceId
+		) {
+			setSystemAudioDevice(
+				selectedAudioOutputDeviceId === "default" ? undefined : selectedAudioOutputDeviceId,
+				selectedAudioOutputDevice.label,
+			);
+		}
+	}, [
+		audioOutputDevices.length,
+		selectedAudioOutputDevice,
+		selectedAudioOutputDeviceId,
+		setSystemAudioDevice,
+		systemAudioDeviceId,
+	]);
 
 	const {
 		showFloatingWebcamPreview,
@@ -256,8 +292,6 @@ function LaunchWindowContent() {
 
 			<MicPopover
 				disabled={recording}
-				systemAudioEnabled={systemAudioEnabled}
-				onToggleSystemAudio={() => setSystemAudioEnabled(!systemAudioEnabled)}
 				microphoneEnabled={microphoneEnabled}
 				onDisableMicrophone={() => setMicrophoneEnabled(false)}
 				devices={devices}
@@ -284,6 +318,39 @@ function LaunchWindowContent() {
 							<MicrophoneIcon size={18} />
 						) : (
 							<MicrophoneSlashIcon size={18} />
+						)}
+					</Button>
+				}
+			/>
+
+			<SystemAudioPopover
+				disabled={recording}
+				deviceSelectionSupported={platform === "win32"}
+				systemAudioEnabled={systemAudioEnabled}
+				onToggleSystemAudio={() => setSystemAudioEnabled(!systemAudioEnabled)}
+				devices={audioOutputDevices}
+				selectedDeviceId={selectedAudioOutputDeviceId}
+				onSelectDevice={(device) => {
+					setSelectedAudioOutputDeviceId(device.deviceId);
+					setSystemAudioDevice(device.deviceId, device.label);
+					setSystemAudioEnabled(true);
+				}}
+				trigger={
+					<Button
+						variant="ghost"
+						size="icon"
+						iconSize="lg"
+						title={
+							systemAudioEnabled
+								? t("recording.turnOffSystemAudio", "Turn Off System Audio")
+								: t("recording.enableSystemAudio")
+						}
+						className={systemAudioEnabled ? styles.ibActive : ""}
+					>
+						{systemAudioEnabled ? (
+							<SpeakerHighIcon size={18} />
+						) : (
+							<SpeakerXIcon size={18} />
 						)}
 					</Button>
 				}
