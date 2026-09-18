@@ -122,15 +122,35 @@ describe("normalizeProjectEditor", () => {
 		const editor = normalizeProjectEditor({
 			cursorClickEffect: "ripple",
 			cursorClickEffectColor: "#2563EB",
+			cursorClickEffectScale: 1.25,
 			rightClickEffect: {
 				effect: "spotlight",
 				color: "#F97316",
+				scale: 1.75,
 			},
 		} as never);
 
 		expect(editor.rightClickEffect).toEqual({
 			effect: "spotlight",
 			color: "#F97316",
+			scale: 1.75,
+		});
+		expect(editor.cursorClickEffectScale).toBe(1.25);
+	});
+
+	it("inherits the left-click size when loading a legacy right-click profile", () => {
+		const editor = normalizeProjectEditor({
+			cursorClickEffectScale: 1.4,
+			rightClickEffect: {
+				effect: "ripple",
+				color: "#EF4444",
+			},
+		} as never);
+
+		expect(editor.rightClickEffect).toEqual({
+			effect: "ripple",
+			color: "#EF4444",
+			scale: 1.4,
 		});
 	});
 

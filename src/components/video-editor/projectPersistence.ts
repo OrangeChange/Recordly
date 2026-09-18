@@ -862,6 +862,7 @@ export function normalizeProjectEditor(editor: Partial<ProjectEditorState>): Pro
 	);
 	const normalizedRightClickEffect = normalizeCursorClickEffectProfile(
 		(editor as Partial<ProjectEditorState>).rightClickEffect,
+		normalizedCursorClickEffectScale,
 	);
 	const normalizedMotionPreset =
 		CURSOR_MOTION_PRESETS[resolveCursorMotionPresetId(normalizedMotionValues)];

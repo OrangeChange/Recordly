@@ -1263,6 +1263,10 @@ export function SettingsPanel({
 		clickEffectTarget === "right"
 			? (rightClickEffect?.color ?? cursorClickEffectColor)
 			: cursorClickEffectColor;
+	const activeClickEffectScale =
+		clickEffectTarget === "right"
+			? (rightClickEffect?.scale ?? cursorClickEffectScale)
+			: cursorClickEffectScale;
 	const rightClickFollowsLeft = !rightClickEffect;
 	const updateActiveClickEffect = (effect: CursorClickEffectStyle) => {
 		if (clickEffectTarget === "left") {
@@ -1273,6 +1277,7 @@ export function SettingsPanel({
 		onRightClickEffectChange?.({
 			effect,
 			color: activeClickEffectColor,
+			scale: activeClickEffectScale,
 		});
 	};
 	const updateActiveClickEffectColor = (color: string) => {
@@ -1284,6 +1289,19 @@ export function SettingsPanel({
 		onRightClickEffectChange?.({
 			effect: activeClickEffect,
 			color,
+			scale: activeClickEffectScale,
+		});
+	};
+	const updateActiveClickEffectScale = (scale: number) => {
+		if (clickEffectTarget === "left") {
+			onCursorClickEffectScaleChange?.(scale);
+			return;
+		}
+
+		onRightClickEffectChange?.({
+			effect: activeClickEffect,
+			color: activeClickEffectColor,
+			scale,
 		});
 	};
 	const cursorPreviewUrls = builtInCursorPreviewUrls;
@@ -3408,6 +3426,7 @@ export function SettingsPanel({
 														: {
 																effect: cursorClickEffect,
 																color: cursorClickEffectColor,
+																scale: cursorClickEffectScale,
 															},
 												);
 											}}
@@ -3496,12 +3515,12 @@ export function SettingsPanel({
 											"effects.cursorClickEffects.size",
 											"Effect Size",
 										)}
-										value={cursorClickEffectScale}
+										value={activeClickEffectScale}
 										defaultValue={DEFAULT_CURSOR_CLICK_EFFECT_SCALE}
 										min={0.5}
 										max={2}
 										step={0.05}
-										onChange={(v) => onCursorClickEffectScaleChange?.(v)}
+										onChange={updateActiveClickEffectScale}
 										formatValue={(v) => `${v.toFixed(2)}×`}
 										parseInput={(text) => parseFloat(text.replace(/×$/, ""))}
 									/>

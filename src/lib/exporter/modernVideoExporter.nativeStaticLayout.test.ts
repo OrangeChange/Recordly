@@ -327,7 +327,7 @@ describe("ModernVideoExporter native static-layout eligibility", () => {
 	it("skips native static-layout when only the right-click effect is enabled", () => {
 		const exporter = createExporter({
 			showCursor: true,
-			rightClickEffect: { effect: "ripple", color: "#EF4444" },
+			rightClickEffect: { effect: "ripple", color: "#EF4444", scale: 1.2 },
 			cursorTelemetry: [
 				{ timeMs: 0, cx: 0.25, cy: 0.35 },
 				{ timeMs: 1_000, cx: 0.5, cy: 0.55, interactionType: "right-click" },

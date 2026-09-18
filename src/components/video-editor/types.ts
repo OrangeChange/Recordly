@@ -70,6 +70,7 @@ export type CursorClickEffectStyle = "none" | "spotlight" | "ripple" | "echo";
 export interface CursorClickEffectProfile {
 	effect: CursorClickEffectStyle;
 	color: string;
+	scale: number;
 }
 
 export function resolveCursorClickEffectProfile(
@@ -87,6 +88,13 @@ export const DEFAULT_CURSOR_CLICK_EFFECT_COLOR = "#2563EB";
 export const DEFAULT_CURSOR_CLICK_EFFECT_SCALE = 1;
 export const DEFAULT_CURSOR_CLICK_EFFECT_OPACITY = 1;
 export const DEFAULT_CURSOR_CLICK_EFFECT_DURATION_MS = 600;
+
+export function normalizeCursorClickEffectScale(
+	value: unknown,
+	fallback: number = DEFAULT_CURSOR_CLICK_EFFECT_SCALE,
+): number {
+	return typeof value === "number" && Number.isFinite(value) ? clamp(value, 0.5, 2) : fallback;
+}
 
 export function normalizeCursorClickEffectStyle(
 	value: unknown,
@@ -124,12 +132,13 @@ export function normalizeCursorClickEffectColor(
 
 export function normalizeCursorClickEffectProfile(
 	value: unknown,
+	fallbackScale: number = DEFAULT_CURSOR_CLICK_EFFECT_SCALE,
 ): CursorClickEffectProfile | undefined {
 	if (!value || typeof value !== "object") {
 		return undefined;
 	}
 
-	const candidate = value as { effect?: unknown; color?: unknown };
+	const candidate = value as { effect?: unknown; color?: unknown; scale?: unknown };
 	if (
 		candidate.effect !== "none" &&
 		candidate.effect !== "spotlight" &&
@@ -148,6 +157,7 @@ export function normalizeCursorClickEffectProfile(
 	return {
 		effect: normalizeCursorClickEffectStyle(candidate.effect),
 		color,
+		scale: normalizeCursorClickEffectScale(candidate.scale, fallbackScale),
 	};
 }
 

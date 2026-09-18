@@ -14,8 +14,8 @@ import {
 } from "./types";
 
 describe("resolveCursorClickEffectProfile", () => {
-	const left = { effect: "ripple" as const, color: "#2563EB" };
-	const right = { effect: "spotlight" as const, color: "#F97316" };
+	const left = { effect: "ripple" as const, color: "#2563EB", scale: 1.25 };
+	const right = { effect: "spotlight" as const, color: "#F97316", scale: 1.75 };
 
 	it("uses the right-click profile only for right-click interactions", () => {
 		expect(resolveCursorClickEffectProfile(left, right, "right-click")).toEqual(right);

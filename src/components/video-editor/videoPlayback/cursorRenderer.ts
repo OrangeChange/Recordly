@@ -1380,6 +1380,7 @@ export class PixiCursorOverlay {
 			{
 				effect: this.config.clickEffect,
 				color: this.config.clickEffectColor,
+				scale: this.config.clickEffectScale,
 			},
 			this.config.rightClickEffect,
 			interactionType,
@@ -1472,7 +1473,7 @@ export class PixiCursorOverlay {
 			clickEffectPy,
 			scaledH,
 			clickProgress,
-			this.config.clickEffectScale,
+			clickEffectProfile.scale,
 			this.config.clickEffectOpacity,
 			clickEffectProfile.color,
 		);
@@ -1683,6 +1684,7 @@ export function drawCursorOnCanvas(
 		{
 			effect: config.clickEffect,
 			color: config.clickEffectColor,
+			scale: config.clickEffectScale,
 		},
 		config.rightClickEffect,
 		interactionType,
@@ -1719,7 +1721,7 @@ export function drawCursorOnCanvas(
 		clickEffectPy,
 		effectHeight,
 		clickProgress,
-		config.clickEffectScale,
+		clickEffectProfile.scale,
 		config.clickEffectOpacity,
 		clickEffectProfile.color,
 	);
