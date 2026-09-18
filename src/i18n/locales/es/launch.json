@@ -5,6 +5,7 @@
 		"disableMicrophone": "Desactivar micrófono",
 		"enableMicrophone": "Activar micrófono",
 		"micToggleDisabledTip": "El micrófono no se puede alternar durante la grabación",
+		"systemAudioToggleDisabledTip": "El audio del sistema no se puede alternar durante la grabación",
 		"disableWebcam": "Desactivar superposición de cámara",
 		"enableWebcam": "Activar superposición de cámara",
 		"countdownDelay": "Retraso de cuenta regresiva",
@@ -23,6 +24,9 @@
 		"windows": "Ventanas",
 		"screen": "Pantalla",
 		"window": "Ventana",
+		"folder": "Carpeta",
+		"display": "Pantalla {{index}}",
+		"primaryDisplay": "Pantalla {{index}} (Principal)",
 		"noSourcesFound": "No se encontraron fuentes",
 		"microphone": "Micrófono",
 		"systemAudio": "Audio del sistema",
@@ -57,7 +61,11 @@
 			"upToDateTitle": "Recordly {{version}} está actualizado.",
 			"availableTitle": "Recordly {{version}} está disponible.",
 			"availableGenericTitle": "Hay una actualización disponible."
-		}
+		},
+		"preparing": "Preparing recording",
+		"preparingSubtitle": "Opening the editor in a moment",
+		"previewUpdateUi": "Preview Update UI",
+		"appearance": "Appearance"
 	},
 	"sourceSelector": {
 		"loadingSources": "Cargando fuentes...",
@@ -94,6 +102,7 @@
 		"notNow": "Ahora no",
 		"updateNow": "Actualizar ahora",
 		"restartToUpdate": "Reiniciar para actualizar",
-		"tryAgain": "Intentar de nuevo"
+		"tryAgain": "Intentar de nuevo",
+		"ariaLabel": "Recordly update"
 	}
 }

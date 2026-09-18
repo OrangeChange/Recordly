@@ -61,5 +61,7 @@ describe("RecordingControls audio indicators", () => {
 		expect(html).toContain('data-testid="microphone-icon"');
 		expect(html).toContain('data-testid="speaker-high-icon"');
 		expect(html.match(/disabled=""/g)).toHaveLength(2);
+		expect(html).toContain('title="recording.systemAudioToggleDisabledTip"');
+		expect(html).toContain('aria-label="recording.systemAudioToggleDisabledTip"');
 	});
 });

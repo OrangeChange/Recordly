@@ -1,6 +1,7 @@
 import { fixWebmDuration } from "@fix-webm-duration/fix";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useI18n } from "@/contexts/I18nContext";
 import { getEffectiveRecordingDurationMs } from "@/lib/mediaTiming";
 import {
 	getVideoExtensionForMimeType,
@@ -377,6 +378,7 @@ async function createAudioInputDeviceSnapshot(): Promise<
 }
 
 export function useScreenRecorder(): UseScreenRecorderReturn {
+	const { t } = useI18n();
 	const [recording, setRecording] = useState(false);
 	const [paused, setPaused] = useState(false);
 	const [starting, setStarting] = useState(false);
@@ -1139,7 +1141,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 		const selectedSource =
 			existingSource ?? (platform === "linux" ? LINUX_PORTAL_SOURCE : null);
 		if (!selectedSource) {
-			alert("Please select a source to record");
+			alert(t("launch.permissions.selectSource", "Please select a source to record"));
 			return null;
 		}
 
@@ -1238,6 +1240,7 @@ export function useScreenRecorder(): UseScreenRecorderReturn {
 		systemAudioDeviceId,
 		systemAudioDeviceName,
 		systemAudioEnabled,
+		t,
 	]);
 
 	const discardActiveNativeCapture = useCallback(async () => {

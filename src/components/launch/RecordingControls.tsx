@@ -87,13 +87,13 @@ export const RecordingControls = ({
 					</Button>
 				</span>
 
-				<span title={t("recording.systemAudio")}>
+				<span title={t("recording.systemAudioToggleDisabledTip")}>
 					<Button
 						variant="ghost"
 						size="icon"
 						iconSize="lg"
 						className={systemAudioEnabled ? styles.ibActive : ""}
-						aria-label={t("recording.systemAudio")}
+						aria-label={t("recording.systemAudioToggleDisabledTip")}
 						disabled
 					>
 						{systemAudioEnabled ? (
