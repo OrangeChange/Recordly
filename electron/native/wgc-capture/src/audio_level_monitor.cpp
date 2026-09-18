@@ -33,6 +33,7 @@ struct OutputMonitorDevice {
     IAudioClient* audioClient = nullptr;
     IAudioCaptureClient* captureClient = nullptr;
     WAVEFORMATEX* mixFormat = nullptr;
+    UINT32 bufferFrameCount = 0;
     bool isDefault = false;
 };
 
@@ -199,6 +200,9 @@ bool initializeMonitorDevice(OutputMonitorDevice& monitor) {
         nullptr);
     if (FAILED(hr)) return false;
 
+    hr = monitor.audioClient->GetBufferSize(&monitor.bufferFrameCount);
+    if (FAILED(hr) || monitor.bufferFrameCount == 0) return false;
+
     hr = monitor.audioClient->GetService(
         __uuidof(IAudioCaptureClient),
         reinterpret_cast<void**>(&monitor.captureClient));
@@ -305,6 +309,22 @@ int runAudioOutputLevelMonitor() {
     }
     enumerator->Release();
 
+    if (monitors.empty()) {
+        std::cerr << "ERROR: No audio output monitor could be initialized" << std::endl;
+        if (shouldUninitialize) CoUninitialize();
+        return 1;
+    }
+
+    DWORD pollIntervalMs = 50;
+    for (const OutputMonitorDevice& monitor : monitors) {
+        if (!monitor.mixFormat || monitor.mixFormat->nSamplesPerSec == 0) continue;
+        const double bufferDurationMs =
+            static_cast<double>(monitor.bufferFrameCount) * 1000.0 /
+            static_cast<double>(monitor.mixFormat->nSamplesPerSec);
+        const DWORD monitorIntervalMs = static_cast<DWORD>((std::max)(1.0, bufferDurationMs / 2.0));
+        pollIntervalMs = (std::min)(pollIntervalMs, monitorIntervalMs);
+    }
+
     std::atomic<bool> stopRequested{false};
     std::thread stdinThread([&stopRequested]() {
         std::string line;
@@ -328,7 +348,7 @@ int runAudioOutputLevelMonitor() {
             if (monitor.isDefault) writeLevel("default", result);
         }
         std::cout.flush();
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(pollIntervalMs));
     }
 
     if (stdinThread.joinable()) stdinThread.join();

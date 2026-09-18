@@ -99,6 +99,7 @@ export function createAudioOutputLevelMonitorManager(
 	let monitorProcess: MonitorChildProcess | null = null;
 	let outputBuffer = "";
 	let stopping: Promise<{ success: boolean }> | null = null;
+	let starting: Promise<{ success: boolean; error?: string }> | null = null;
 
 	const clearProcess = (processToClear: MonitorChildProcess) => {
 		if (monitorProcess !== processToClear) return;
@@ -108,6 +109,13 @@ export function createAudioOutputLevelMonitorManager(
 
 	const stop = async (): Promise<{ success: boolean }> => {
 		if (stopping) return stopping;
+		if (starting) {
+			try {
+				await starting;
+			} catch {
+				// A failed startup leaves no process to stop.
+			}
+		}
 		const current = monitorProcess;
 		if (!current) return { success: true };
 
@@ -153,45 +161,57 @@ export function createAudioOutputLevelMonitorManager(
 	const start = async (): Promise<{ success: boolean; error?: string }> => {
 		if (stopping) await stopping;
 		if (monitorProcess) return { success: true };
-		if (!isWindows()) return { success: false, error: "System audio level monitoring is Windows-only" };
+		if (starting) return starting;
 
-		const helperPath = getHelperPath();
-		try {
-			await access(helperPath, fsConstants.F_OK);
-		} catch {
-			console.warn("Windows audio output level monitor helper missing:", helperPath);
-			return { success: false, error: "Audio output level monitor helper is unavailable" };
-		}
+		starting = (async () => {
+			if (!isWindows()) {
+				return { success: false, error: "System audio level monitoring is Windows-only" };
+			}
 
-		let child: MonitorChildProcess;
-		try {
-			child = spawnMonitor(helperPath, ["--monitor-audio-outputs"], {
-				stdio: ["pipe", "pipe", "pipe"],
-				windowsHide: true,
+			const helperPath = getHelperPath();
+			try {
+				await access(helperPath, fsConstants.F_OK);
+			} catch {
+				console.warn("Windows audio output level monitor helper missing:", helperPath);
+				return { success: false, error: "Audio output level monitor helper is unavailable" };
+			}
+
+			let child: MonitorChildProcess;
+			try {
+				child = spawnMonitor(helperPath, ["--monitor-audio-outputs"], {
+					stdio: ["pipe", "pipe", "pipe"],
+					windowsHide: true,
+				});
+			} catch (error) {
+				console.warn("Failed to spawn audio output level monitor:", error);
+				return { success: false, error: String(error) };
+			}
+
+			monitorProcess = child;
+			outputBuffer = "";
+			child.stdout.on("data", (chunk) => {
+				outputBuffer += chunk.toString();
+				const result = splitAudioOutputMonitorLines(outputBuffer);
+				outputBuffer = result.remainder;
+				result.events.forEach(broadcast);
 			});
-		} catch (error) {
-			console.warn("Failed to spawn audio output level monitor:", error);
-			return { success: false, error: String(error) };
+			child.stderr.on("data", () => {
+				// Drain stderr so helper diagnostics cannot block stdout telemetry.
+			});
+			child.once("error", (error) => {
+				console.warn("Audio output level monitor process error:", error);
+				clearProcess(child);
+			});
+			child.once("close", () => clearProcess(child));
+
+			return { success: true };
+		})();
+
+		try {
+			return await starting;
+		} finally {
+			starting = null;
 		}
-
-		monitorProcess = child;
-		outputBuffer = "";
-		child.stdout.on("data", (chunk) => {
-			outputBuffer += chunk.toString();
-			const result = splitAudioOutputMonitorLines(outputBuffer);
-			outputBuffer = result.remainder;
-			result.events.forEach(broadcast);
-		});
-		child.stderr.on("data", () => {
-			// Drain stderr so helper diagnostics cannot block stdout telemetry.
-		});
-		child.once("error", (error) => {
-			console.warn("Audio output level monitor process error:", error);
-			clearProcess(child);
-		});
-		child.once("close", () => clearProcess(child));
-
-		return { success: true };
 	};
 
 	return { start, stop };
@@ -206,4 +226,3 @@ export function registerAudioOutputMonitorHandlers() {
 	ipcMain.handle("start-audio-output-level-monitor", () => defaultMonitorManager.start());
 	ipcMain.handle("stop-audio-output-level-monitor", () => defaultMonitorManager.stop());
 }
-

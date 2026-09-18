@@ -52,6 +52,7 @@ describe("audio output level monitor lifecycle", () => {
 	it("starts one helper, broadcasts events, and writes stop only once", async () => {
 		const process = new FakeMonitorProcess();
 		const spawn = vi.fn(() => process);
+		const write = vi.spyOn(process.stdin, "write");
 		const broadcasts: unknown[] = [];
 		const manager = createAudioOutputLevelMonitorManager({
 			isWindows: () => true,
@@ -71,12 +72,41 @@ describe("audio output level monitor lifecycle", () => {
 			{ deviceId: "dev-1", rms: 0.2, peak: 0.4, level: 40 },
 		]);
 
-		const write = vi.spyOn(process.stdin, "write");
 		const stopPromise = manager.stop();
 		await manager.stop();
 		process.emit("close", 0);
 		await stopPromise;
 		expect(write).toHaveBeenCalledTimes(1);
+		expect(write).toHaveBeenCalledWith("stop\n");
+	});
+
+	it("serializes overlapping starts and waits before stopping", async () => {
+		const process = new FakeMonitorProcess();
+		const spawn = vi.fn(() => process);
+		const write = vi.spyOn(process.stdin, "write");
+		let resolveAccess!: () => void;
+		const accessPromise = new Promise<void>((resolve) => {
+			resolveAccess = resolve;
+		});
+		const manager = createAudioOutputLevelMonitorManager({
+			isWindows: () => true,
+			getHelperPath: () => "helper.exe",
+			access: () => accessPromise,
+			spawn,
+		});
+
+		const firstStart = manager.start();
+		const secondStart = manager.start();
+		const stop = manager.stop();
+
+		resolveAccess();
+		await expect(Promise.all([firstStart, secondStart, stop])).resolves.toEqual([
+			{ success: true },
+			{ success: true },
+			{ success: true },
+		]);
+
+		expect(spawn).toHaveBeenCalledTimes(1);
 		expect(write).toHaveBeenCalledWith("stop\n");
 	});
 });

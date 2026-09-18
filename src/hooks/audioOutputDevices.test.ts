@@ -3,6 +3,7 @@ import {
 	type AudioOutputDevice,
 	enrichNativeAudioOutputLabels,
 	getDefaultAudioOutputLabel,
+	isLatestAudioOutputDeviceRequest,
 	resolveAudioOutputDeviceSelection,
 } from "./audioOutputDevices";
 
@@ -50,6 +51,13 @@ describe("resolveAudioOutputDeviceSelection", () => {
 			deviceId: "default",
 			label: "Default output",
 		});
+	});
+});
+
+describe("audio output device request ordering", () => {
+	it("only accepts the latest request result", () => {
+		expect(isLatestAudioOutputDeviceRequest(1, 2)).toBe(false);
+		expect(isLatestAudioOutputDeviceRequest(2, 2)).toBe(true);
 	});
 });
 

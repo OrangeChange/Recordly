@@ -16,6 +16,13 @@ export interface NativeAudioOutputDevice {
 	label: string;
 }
 
+export function isLatestAudioOutputDeviceRequest(
+	requestId: number,
+	latestRequestId: number,
+): boolean {
+	return requestId === latestRequestId;
+}
+
 const DEFAULT_OUTPUT_DEVICE: AudioOutputDevice = {
 	deviceId: "default",
 	label: "Default output",
@@ -150,7 +157,9 @@ export function useAudioOutputDevices(
 		}
 
 		let mounted = true;
+		let latestRequestId = 0;
 		const loadDevices = async () => {
+			const requestId = ++latestRequestId;
 			try {
 				setIsLoading(true);
 				setError(null);
@@ -177,7 +186,7 @@ export function useAudioOutputDevices(
 					];
 				}
 
-				if (!mounted) {
+				if (!mounted || !isLatestAudioOutputDeviceRequest(requestId, latestRequestId)) {
 					return;
 				}
 
@@ -192,7 +201,7 @@ export function useAudioOutputDevices(
 				});
 				setIsLoading(false);
 			} catch (loadError) {
-				if (!mounted) {
+				if (!mounted || !isLatestAudioOutputDeviceRequest(requestId, latestRequestId)) {
 					return;
 				}
 				const message =
@@ -213,6 +222,7 @@ export function useAudioOutputDevices(
 
 		return () => {
 			mounted = false;
+			latestRequestId += 1;
 			navigator.mediaDevices.removeEventListener("devicechange", handleDeviceChange);
 		};
 	}, [enabled, preferredDeviceId, preferredLabel]);
