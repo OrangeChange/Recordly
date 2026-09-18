@@ -49,3 +49,12 @@ export function getSourceDisplayLabel(
 		? getLocalizedSourceLabel(source.name, translate)
 		: source.windowTitle || source.name;
 }
+
+export function getSelectedSourceDisplayLabel(
+	source: Pick<DesktopSource, "id" | "name" | "sourceType" | "windowTitle"> | null | undefined,
+	translate: SourceLabelTranslate,
+): string {
+	return source
+		? getSourceDisplayLabel(source, translate)
+		: getLocalizedSourceLabel("Screen", translate);
+}

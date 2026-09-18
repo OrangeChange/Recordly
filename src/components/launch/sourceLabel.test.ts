@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { getLocalizedSourceLabel, getSourceDisplayLabel } from "./sourceLabel";
+import {
+	getLocalizedSourceLabel,
+	getSelectedSourceDisplayLabel,
+	getSourceDisplayLabel,
+} from "./sourceLabel";
 
 const translate = (key: string, _fallback?: string, vars?: Record<string, string | number>) => {
 	if (key === "recording.screen") return "屏幕";
@@ -50,5 +54,19 @@ describe("getLocalizedSourceLabel", () => {
 				translate,
 			),
 		).toBe("显示器 1");
+	});
+
+	it("keeps a window title that looks like a screen name in the launch trigger", () => {
+		expect(
+			getSelectedSourceDisplayLabel(
+				{
+					id: "window:screen-like-title",
+					name: "Screen 1",
+					windowTitle: "Screen 1",
+					sourceType: "window",
+				},
+				translate,
+			),
+		).toBe("Screen 1");
 	});
 });
