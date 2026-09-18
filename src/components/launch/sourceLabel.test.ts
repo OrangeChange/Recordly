@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getLocalizedSourceLabel } from "./sourceLabel";
+import { getLocalizedSourceLabel, getSourceDisplayLabel } from "./sourceLabel";
 
 const translate = (key: string, _fallback?: string, vars?: Record<string, string | number>) => {
 	if (key === "recording.screen") return "屏幕";
@@ -27,5 +27,28 @@ describe("getLocalizedSourceLabel", () => {
 		expect(getLocalizedSourceLabel("FolderBrowser", translate)).toBe("文件夹");
 		expect(getLocalizedSourceLabel("文件夹", translate)).toBe("文件夹");
 		expect(getLocalizedSourceLabel("ChatGPT — Recordly", translate)).toBe("ChatGPT — Recordly");
+	});
+
+	it("does not localize a window title that happens to look like a screen name", () => {
+		expect(
+			getSourceDisplayLabel(
+				{
+					id: "window:screen-like-title",
+					name: "Screen 1",
+					windowTitle: "Screen 1",
+					sourceType: "window",
+				},
+				translate,
+			),
+		).toBe("Screen 1");
+	});
+
+	it("localizes generated labels for actual screen sources", () => {
+		expect(
+			getSourceDisplayLabel(
+				{ id: "screen:1", name: "Screen 1", sourceType: "screen" },
+				translate,
+			),
+		).toBe("显示器 1");
 	});
 });

@@ -4,7 +4,7 @@
 		"existsOrNoSpace": "该位置已存在缩放或空间不足。",
 		"suggestUnavailable": "启用光标循环时无法使用缩放建议。",
 		"suggestHandlerUnavailable": "缩放建议处理不可用",
-		"noTelemetry": "无有效光标轨迹测数据",
+		"noTelemetry": "无有效光标轨迹数据",
 		"recordFirst": "请先录制屏幕，以生成基于光标轨迹的缩放建议。",
 		"noUsableTelemetry": "无可用的光标轨迹数据",
 		"notEnoughMovement": "录制中未包含足够的光标移动数据。",

@@ -15,7 +15,7 @@ import "./launchTheme.css";
 import "./SourceSelector.css";
 import { useHudInteraction } from "./contexts/HudInteractionContext";
 import { MarqueeText } from "./MarqueeText";
-import { getLocalizedSourceLabel } from "./sourceLabel";
+import { getLocalizedSourceLabel, getSourceDisplayLabel } from "./sourceLabel";
 
 interface SourceSelectorProps {
 	/** List of available screen sources */
@@ -55,10 +55,7 @@ export const SourceSelectorContent = ({
 	const { t: tCommon } = useI18n();
 	const renderSourceItem = (source: DesktopSource, index: number) => {
 		const isSelected = selectedSource === source.name;
-		const sourceLabel = getLocalizedSourceLabel(
-			isScreenSource(source) ? source.name : source.windowTitle || source.name,
-			t,
-		);
+		const sourceLabel = getSourceDisplayLabel(source, t);
 		return (
 			<button
 				key={`${source.id}-${index}`}
