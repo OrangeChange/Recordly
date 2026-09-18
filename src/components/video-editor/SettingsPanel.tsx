@@ -142,6 +142,13 @@ const CAPTION_ANIMATION_OPTIONS: Array<{ value: AutoCaptionAnimation; label: str
 	{ value: "pop", label: "Pop" },
 ];
 
+const CAPTION_ANIMATION_LABEL_KEYS: Record<AutoCaptionAnimation, string> = {
+	none: "animationOff",
+	fade: "animationFade",
+	rise: "animationRise",
+	pop: "animationPop",
+};
+
 const CLICK_EFFECT_COLOR_OPTIONS = [
 	"#2563EB",
 	"#EF4444",
@@ -717,7 +724,7 @@ const APP_LANGUAGE_LABELS: Record<AppLocale, string> = {
 	nl: "Nederlands",
 	ko: "한국어",
 	"pt-BR": "Português",
-	"zh-CN": "簡體中文",
+	"zh-CN": "简体中文",
 	"zh-TW": "繁體中文",
 };
 
@@ -1709,16 +1716,21 @@ export function SettingsPanel({
 			if (!result?.success || !result.path) return;
 			const filePath = result.path;
 			if (!isVideoWallpaperSource(filePath)) {
-				toast.error("Unsupported format", {
-					description: "Please select a video file (mp4, webm, mov, etc.)",
+				toast.error(tSettings("background.unsupportedFormat", "Unsupported format"), {
+					description: tSettings(
+						"background.videoFormatDescription",
+						"Please select a video file (mp4, webm, mov, etc.)",
+					),
 				});
 				return;
 			}
 			setCustomImages((prev) => [filePath, ...prev]);
 			onWallpaperChange(filePath);
-			toast.success("Video background added");
+			toast.success(tSettings("background.videoAdded", "Video background added"));
 		} catch {
-			toast.error("Failed to import video background");
+			toast.error(
+				tSettings("background.videoImportFailed", "Failed to import video background"),
+			);
 		}
 	};
 
@@ -1988,10 +2000,13 @@ export function SettingsPanel({
 											style={{
 												background: `linear-gradient(135deg, ${selectedColor} 0%, ${selectedColor} 58%, rgba(255,255,255,0.92) 58%, rgba(255,255,255,0.92) 100%)`,
 											}}
-											aria-label="Custom color picker"
+											aria-label={tSettings(
+												"effects.customColorPicker",
+												"Custom color picker",
+											)}
 										>
 											<div className="absolute inset-0 flex items-center justify-center text-[9px] font-semibold uppercase tracking-[0.18em] text-foreground/90">
-												Pick
+												{tSettings("effects.pickColor", "Pick")}
 											</div>
 										</button>
 									</div>
@@ -2327,7 +2342,7 @@ export function SettingsPanel({
 						<SelectContent className="border-foreground/10 bg-editor-surface-alt text-foreground">
 							{CAPTION_LANGUAGE_OPTIONS.map((option) => (
 								<SelectItem key={option.value} value={option.value}>
-									{option.label}
+									{tSettings(`captions.languages.${option.value}`, option.label)}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -2427,7 +2442,10 @@ export function SettingsPanel({
 						<SelectContent className="border-foreground/10 bg-editor-surface-alt text-foreground">
 							{CAPTION_ANIMATION_OPTIONS.map((option) => (
 								<SelectItem key={option.value} value={option.value}>
-									{option.label}
+									{tSettings(
+										`captions.${CAPTION_ANIMATION_LABEL_KEYS[option.value]}`,
+										option.label,
+									)}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -2435,7 +2453,10 @@ export function SettingsPanel({
 				</div>
 				<div className="flex items-center justify-between gap-3 rounded-lg bg-foreground/[0.03] px-2.5 py-2">
 					<div className="text-[10px] text-muted-foreground">
-						{tSettings("captions.timelineQuickAdd", "Hover to add on timeline")}
+						{tSettings(
+							"captions.timelineQuickAdd",
+							"Hover to add a caption on the timeline",
+						)}
 					</div>
 					<Switch
 						checked={autoCaptionSettings.timelineQuickAdd}
@@ -2683,7 +2704,7 @@ export function SettingsPanel({
 								</div>
 							</div>
 							<span className="rounded-full bg-[#2563EB]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#2563EB]">
-								DEV
+								{tSettings("effects.devBadge", "DEV")}
 							</span>
 						</div>
 
@@ -3281,8 +3302,14 @@ export function SettingsPanel({
 										<ToggleGroupItem
 											key={option.value}
 											value={option.value}
-											title={option.label}
-											aria-label={option.label}
+											title={tSettings(
+												`effects.cursorStyleOptions.${option.value}`,
+												option.label,
+											)}
+											aria-label={tSettings(
+												`effects.cursorStyleOptions.${option.value}`,
+												option.label,
+											)}
 											className={cn(
 												"group aspect-square h-auto min-w-0 rounded-[10px] border border-foreground/10 bg-foreground/[0.03] p-3 text-left text-foreground shadow-none transition-all hover:border-foreground/20 hover:bg-foreground/[0.06]",
 												"data-[state=on]:border-[#2563EB]/70 data-[state=on]:bg-[#2563EB]/12 data-[state=on]:text-foreground",
@@ -3375,10 +3402,13 @@ export function SettingsPanel({
 												style={{
 													background: `linear-gradient(135deg, ${cursorClickEffectColor} 0%, ${cursorClickEffectColor} 58%, rgba(255,255,255,0.92) 58%, rgba(255,255,255,0.92) 100%)`,
 												}}
-												aria-label="Custom effect color picker"
+												aria-label={tSettings(
+													"effects.customEffectColorPicker",
+													"Custom effect color picker",
+												)}
 											>
 												<div className="absolute inset-0 flex items-center justify-center">
-													Pick
+													{tSettings("effects.pickColor", "Pick")}
 												</div>
 											</button>
 										</div>
