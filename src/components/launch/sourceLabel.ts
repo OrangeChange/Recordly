@@ -1,3 +1,5 @@
+import type { DesktopSource } from "./popovers/launchPopoverTypes";
+
 type SourceLabelTranslate = (
 	key: string,
 	fallback?: string,
@@ -32,4 +34,27 @@ export function getLocalizedSourceLabel(
 	return isPrimary
 		? translate("recording.primaryDisplay", "Display {{index}} (Primary)", { index })
 		: translate("recording.display", "Display {{index}}", { index });
+}
+
+/**
+ * Localizes generated display labels only for actual screen sources.
+ * Window titles are user/application content and must remain unchanged.
+ */
+export function getSourceDisplayLabel(
+	source: Pick<DesktopSource, "id" | "name" | "sourceType" | "windowTitle">,
+	translate: SourceLabelTranslate,
+): string {
+	const isScreen = source.sourceType === "screen" || source.id.startsWith("screen:");
+	return isScreen
+		? getLocalizedSourceLabel(source.name, translate)
+		: source.windowTitle || source.name;
+}
+
+export function getSelectedSourceDisplayLabel(
+	source: Pick<DesktopSource, "id" | "name" | "sourceType" | "windowTitle"> | null | undefined,
+	translate: SourceLabelTranslate,
+): string {
+	return source
+		? getSourceDisplayLabel(source, translate)
+		: getLocalizedSourceLabel("Screen", translate);
 }

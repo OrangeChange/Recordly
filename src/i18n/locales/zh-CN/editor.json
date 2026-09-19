@@ -261,6 +261,8 @@
 	"audio": {
 		"fallbackUnavailable": "无法加载备用音频源",
 		"fallbackPlaybackHint": "播放和导出可能会缺失麦克风声音。",
+		"fallbackUnavailableWithError": "无法加载备用音频源：{{error}}",
+		"fallbackUnavailableWithPlaybackHint": "无法加载备用音频源。播放和导出可能会缺失麦克风声音。",
 		"fallbackLoadError": "无法加载备用音频来源"
 	},
 	"captions": {

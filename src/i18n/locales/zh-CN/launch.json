@@ -85,7 +85,7 @@
 		"accessibilityMissing": "辅助功能权限仍然缺失。已再次打开系统设置。请启用权限，并在录制前重新打开 Recordly。",
 		"selectSource": "请选择要录制的源",
 		"systemAudioUnavailable": "此录制源不支持系统音频。将不包含系统音频继续录制。",
-		"microphoneDenied": "麦克风访问被拒绝。将不包含麦克风音继续录制频。",
+		"microphoneDenied": "麦克风访问被拒绝。将继续录制，但不包含麦克风音频。",
 		"failedToStart": "启动录制失败：{{error}}",
 		"failedToStartGeneric": "启动录制失败"
 	},

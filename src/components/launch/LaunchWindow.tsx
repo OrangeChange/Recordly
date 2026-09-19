@@ -46,7 +46,7 @@ import { SourcePopover } from "./popovers/SourcePopover";
 import { SystemAudioPopover } from "./popovers/SystemAudioPopover";
 import { WebcamPopover } from "./popovers/WebcamPopover";
 import { RecordingControls } from "./RecordingControls";
-import { getLocalizedSourceLabel } from "./sourceLabel";
+import { getSelectedSourceDisplayLabel } from "./sourceLabel";
 
 const SHOW_DEV_UPDATE_PREVIEW = import.meta.env.DEV;
 
@@ -103,7 +103,8 @@ function LaunchWindowContent() {
 		syncSelectedSource,
 		refreshProjectLibrary,
 	} = useLaunchWindowActions();
-	const selectedSourceLabel = getLocalizedSourceLabel(selectedSource, t);
+	const selectedSourceLabel = getSelectedSourceDisplayLabel(selectedSource, t);
+	const selectedSourceName = selectedSource?.name ?? "Screen";
 
 	const showWebcamControls = webcamEnabled && !recording;
 	const { devices, selectedDeviceId, setSelectedDeviceId } = useMicrophoneDevices(
@@ -265,7 +266,7 @@ function LaunchWindowContent() {
 			{platform !== "linux" && (
 				<>
 					<SourcePopover
-						selectedSource={selectedSource}
+						selectedSource={selectedSourceName}
 						onSourceSelect={handleSourceSelect}
 						onOpen={beginInteractiveHudAction}
 						trigger={

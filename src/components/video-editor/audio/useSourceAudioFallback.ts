@@ -10,6 +10,25 @@ interface UseSourceAudioFallbackParams {
 	t: I18nTranslate;
 }
 
+export function formatSourceAudioFallbackWarning(
+	t: I18nTranslate,
+	summarizeErrorMessage: (message: string) => string,
+	error: string | null | undefined,
+): string {
+	if (error) {
+		return t(
+			"editor.audio.fallbackUnavailableWithError",
+			"Could not load companion audio sources: {{error}}",
+			{ error: summarizeErrorMessage(error) },
+		);
+	}
+
+	return t(
+		"editor.audio.fallbackUnavailableWithPlaybackHint",
+		"Could not load companion audio sources. Playback and export may miss microphone audio.",
+	);
+}
+
 export function useSourceAudioFallback({
 	currentSourcePath,
 	refreshKey = 0,
@@ -51,9 +70,7 @@ export function useSourceAudioFallback({
 						setSourceAudioFallbackStartDelayMsByPath({});
 					}
 					toast.warning(
-						result.error
-							? `${t("editor.audio.fallbackUnavailable", "Could not load companion audio sources")}: ${summarizeErrorMessage(result.error)}`
-							: `${t("editor.audio.fallbackUnavailable", "Could not load companion audio sources")}. ${t("editor.audio.fallbackPlaybackHint", "Playback and export may miss microphone audio.")}`,
+						formatSourceAudioFallbackWarning(t, summarizeErrorMessage, result.error),
 						{ id: SOURCE_AUDIO_FALLBACK_TOAST_ID, duration: 10000 },
 					);
 					return;
@@ -69,7 +86,7 @@ export function useSourceAudioFallback({
 						setSourceAudioFallbackStartDelayMsByPath({});
 					}
 					toast.warning(
-						`${t("editor.audio.fallbackUnavailable", "Could not load companion audio sources")}: ${summarizeErrorMessage(String(error))}`,
+						formatSourceAudioFallbackWarning(t, summarizeErrorMessage, String(error)),
 						{ id: SOURCE_AUDIO_FALLBACK_TOAST_ID, duration: 10000 },
 					);
 				}

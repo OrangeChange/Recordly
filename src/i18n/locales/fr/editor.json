@@ -261,6 +261,8 @@
 	"audio": {
 		"fallbackUnavailable": "Could not load companion audio sources",
 		"fallbackPlaybackHint": "Playback and export may miss microphone audio.",
+		"fallbackUnavailableWithError": "Could not load companion audio sources: {{error}}",
+		"fallbackUnavailableWithPlaybackHint": "Could not load companion audio sources. Playback and export may miss microphone audio.",
 		"fallbackLoadError": "Could not load companion audio source"
 	},
 	"captions": {
